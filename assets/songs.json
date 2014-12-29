@@ -1,0 +1,16 @@
+{
+	"songs":[
+		{
+			"name": "停擺",
+			"url": "assets/stop.mp3"
+		},
+		{
+			"name": "National Anthem  - Acadia",
+			"url": "assets/acadia.mp3"
+		},
+		{
+			"name": "National Anthem - Artsakh",
+			"url": "assets/artsakh.mp3"
+		}
+	]
+}
