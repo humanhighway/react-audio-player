@@ -22,6 +22,7 @@ module.exports = React.createClass({
 		return {
 			isPlaying: false,
 			isPause: false,
+			isLoading: false,
 			currentSongIndex: -1,
 			volume: 0.5
 		};
@@ -65,6 +66,7 @@ module.exports = React.createClass({
 
 		var topComponents = [
 			<ButtonPanel isPlaying={this.state.isPlaying} isPause={this.state.isPause}
+					isLoading={this.state.isLoading}
 					currentSongIndex={this.state.currentSongIndex} songCount={songCount}
 					onPlayBtnClick={this.onPlayBtnClick} onPauseBtnClick={this.onPauseBtnClick}
 					onPrevBtnClick={this.onPrevBtnClick} onNextBtnClick={this.onNextBtnClick} />,
@@ -162,11 +164,11 @@ module.exports = React.createClass({
 				this._play();
 			}
 		}
-
 	},
 
 	initSoundObject: function() {
 		this.clearSoundObject();
+		this.setState({ isLoading: true });
 
 		var song = this.state.songs[this.state.currentSongIndex];
 		this.howler = new Howl({
@@ -186,7 +188,10 @@ module.exports = React.createClass({
 
 	initSoundObjectCompleted: function() {
 		this._play();
-		this.setState({ duration: this.howler.duration() });
+		this.setState({ 
+			duration: this.howler.duration(),
+			isLoading: false
+		});
 	},
 
 	_play: function() {

@@ -13,19 +13,30 @@ module.exports = React.createClass({
 	},
 
 	render: function() {
+
 		var isPlaying = this.props.isPlaying;
 		var isPause = this.props.isPause;
+		var isLoading = this.props.isLoading;
 		var isShowPlayBtn = !isPlaying || isPause;
 		var buttonClickHandler = isShowPlayBtn ? this.props.onPlayBtnClick : this.props.onPauseBtnClick;
-		var iconName = isShowPlayBtn ? "play" : "pause";
+		var iconName;
+		var iconClasses = "";
+
+		if (isLoading) {
+			iconName = "refresh";
+			iconClasses = "audio-refresh-animate";
+		} else {
+			iconName = isShowPlayBtn ? "play" : "pause";
+		}
+
 		var songIndex = this.props.currentSongIndex;
-		var classes = "audio-button-panel pull-left";
+		var buttonPanelClasses = "audio-button-panel pull-left";
 
 		if (this.props.songCount < 2) {
 			return (
-				<ButtonGroup className={classes}>
+				<ButtonGroup className={buttonPanelClasses}>
 					<Button bsSize="small" onClick={buttonClickHandler}>
-						<Glyphicon glyph={iconName} />
+						<Glyphicon className={iconClasses} glyph={iconName} />
 					</Button>
 				</ButtonGroup>
 			);
@@ -34,12 +45,12 @@ module.exports = React.createClass({
 			var nextButtonClass = songIndex == this.props.songCount - 1 ? "disabled" : "";
 			
 			return (
-				<ButtonGroup className={classes}>
+				<ButtonGroup className={buttonPanelClasses}>
 					<Button bsSize="small" onClick={this.props.onPrevBtnClick}>
 						<Glyphicon glyph="step-backward" />
 					</Button>
 					<Button bsSize="small" onClick={buttonClickHandler}>
-						<Glyphicon glyph={iconName} />
+						<Glyphicon className={iconClasses} glyph={iconName} />
 					</Button>
 					<Button bsSize="small" onClick={this.props.onNextBtnClick} className={nextButtonClass}>
 						<Glyphicon glyph="step-forward" />

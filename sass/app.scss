@@ -1,4 +1,5 @@
 $common-padding: 5px;
+$animate-sec: 1.5s;
 
 .audio-player {
 	max-width: 324px;
@@ -9,6 +10,14 @@ $common-padding: 5px;
 
 .audio-button-panel {
 	padding-top: 2px;
+}
+
+.audio-refresh-animate {
+  -webkit-animation: rotating $animate-sec linear infinite;
+  -moz-animation: rotating $animate-sec linear infinite;
+  -ms-animation: rotating $animate-sec linear infinite;
+  -o-animation: rotating $animate-sec linear infinite;
+  animation: rotating $animate-sec linear infinite;
 }
 
 .audio-progress-container {
@@ -94,12 +103,6 @@ $common-padding: 5px;
 
 }
 
-// .audio-time-container {
-// 	margin-left: $common-padding;
-// 	height: 30px;
-// 	line-height: 30px;
-// }
-
 .audio-desc-container {
 	width: 100%;
 	vertical-align: middle;
@@ -117,4 +120,38 @@ $common-padding: 5px;
 	text-overflow: ellipsis;
 	-o-text-overflow: ellipsis;
 	overflow: hidden;
+}
+
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes rotating {
+  from {
+    transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+  }
 }
