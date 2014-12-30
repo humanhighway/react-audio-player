@@ -14,3 +14,7 @@ other mp3 source from http://www.noiseaddicts.com/
 ## how to use :
 
 check the index.html example
+
+## online example :
+
+http://humanhighway.github.io/react-audio-player/
