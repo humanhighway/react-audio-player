@@ -3,6 +3,8 @@ var classnames = require('classnames');
 var Button = require('react-bootstrap/Button');
 var Glyphicon = require('react-bootstrap/Glyphicon');
 
+var uniquleId = 0
+
 module.exports = React.createClass({
 	
 	getInitialState: function() {
@@ -20,9 +22,12 @@ module.exports = React.createClass({
   		'audio-volume-bar-hide': this.state.hide
 		});
 
+		audioVolumeBarContainerId = "audioVolumeBarContainerId" + ++uniquleId;
+		toggleBtnId = "toggleBtn" + ++uniquleId;
+
 		return (
-			<div ref="audioVolumeBarContainer" className="audio-volume-bar-container">
-				<Button ref="toggleButton" bsSize="small" onClick={this.toggle}>
+			<div id={audioVolumeBarContainerId} ref="audioVolumeBarContainer" className="audio-volume-bar-container">
+				<Button id={toggleBtnId} ref="toggleButton" bsSize="small" onClick={this.toggle}>
 					<Glyphicon glyph={toggleIcon}/>
 				</Button>
 				<div className={audioVolumeBarClasses}>
@@ -55,14 +60,14 @@ module.exports = React.createClass({
 
 		this.setState({ hide: false });
 		this.globalClickHandler = $(document).mousedown(function(e) {
-			var reactId = this.refs.audioVolumeBarContainer._rootNodeID;
-			var toggleBtnReactId = this.refs.toggleButton._rootNodeID;
+			var reactId = this.refs.audioVolumeBarContainer.props.id;
+			var toggleBtnReactId = this.refs.toggleButton.props.id;
 			node = e.target;
 			while(node != null) {
-				var nodeReactId =  $(node).attr('data-reactid');
-				if (reactId == nodeReactId) {
+				var nodeReactId =  $(node).context.id;
+				if (reactId === nodeReactId) {
 					return;
-				} else if (toggleBtnReactId == nodeReactId) {
+				} else if (toggleBtnReactId === nodeReactId) {
 					this.isToggleBtnPress = true;
 					break;
 				}
