@@ -1,5 +1,6 @@
 var React = require('react/addons');
 var ProgressBar = require('react-bootstrap/ProgressBar');
+var classnames = require("classnames");
 
 module.exports = React.createClass({
 
@@ -10,8 +11,7 @@ module.exports = React.createClass({
 	render: function() {
 		var percent = this.props.percent * 100;
 		var style = { width: percent + "%" };
-		var cx = React.addons.classSet;
-		var classes = cx({
+		var classes = classnames({
   		'audio-progress-container': true,
   		'pull-left': true,
   		'audio-progress-container-short-width': this.props.shorter

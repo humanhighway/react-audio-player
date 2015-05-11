@@ -1,4 +1,5 @@
 var React = require('react/addons');
+var classnames = require("classnames");
 var MenuItem = require("react-bootstrap/MenuItem");
 var Glyphicon = require('react-bootstrap/Glyphicon');
 
@@ -17,8 +18,7 @@ module.exports = React.createClass({
 
 		components[1] = <span className="audio-song-item-label" >{this.props.name}</span>;
 		
-		var cx = React.addons.classSet;
-		var classes = cx({
+		var classes = classnames({
   		'audio-song-item': true,
   		'active': isSelected,
 		});

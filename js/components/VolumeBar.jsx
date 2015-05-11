@@ -1,4 +1,5 @@
 var React = require('react/addons');
+var classnames = require('classnames');
 var Button = require('react-bootstrap/Button');
 var Glyphicon = require('react-bootstrap/Glyphicon');
 
@@ -14,8 +15,7 @@ module.exports = React.createClass({
 		var style = {top: (100 - percent) + "%"};
 		var toggleIcon = this.props.volume == 0 ? "volume-off" : "volume-up";
 
-		var cx = React.addons.classSet;
-		var audioVolumeBarClasses = cx({
+		var audioVolumeBarClasses = classnames({
 			'audio-volume-bar': true,
   		'audio-volume-bar-hide': this.state.hide
 		});
