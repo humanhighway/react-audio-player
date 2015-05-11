@@ -25,7 +25,7 @@ module.exports = React.createClass({
 														name={songName}
 														isPlaying={isPlaying} 
 														isPause={isPause} 
-														onSongItemClick={this.props.onSongItemClick.bind(this, index)} /> ;
+														onSongItemClick={this.props.onSongItemClick.bind(null, index)} /> ;
 		}, this);
 
 		return (
