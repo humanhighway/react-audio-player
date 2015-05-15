@@ -1,10 +1,10 @@
 var React = require('react/addons');
-var ButtonPanel = require("./ButtonPanel.jsx");
-var ProgressBar = require("./ProgressBar.jsx");
-var VolumeBar = require("./VolumeBar.jsx");
-var TimeLabel = require("./TimeLabel.jsx");
-var NameLabel = require("./NameLabel.jsx");
-var SongList = require("./SongList.jsx");
+var ButtonPanel = require("./ButtonPanel");
+var ProgressBar = require("./ProgressBar");
+var VolumeBar = require("./VolumeBar");
+var TimeLabel = require("./TimeLabel");
+var NameLabel = require("./NameLabel");
+var SongList = require("./SongList");
 
 var SongFormatterMixin = require("./../mixins/SongFormatterMixin");
 
