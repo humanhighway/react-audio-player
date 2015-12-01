@@ -1,29 +1,32 @@
-var React = require('react/addons');
-var classnames = require('classnames');
-var Button = require('react-bootstrap/Button');
-var Glyphicon = require('react-bootstrap/Glyphicon');
+import React, { Component } from 'react';
+import classnames from 'classnames';
+import { Button, Glyphicon } from 'react-bootstrap';
 
-var uniquleId = 0
+let uniquleId = 0;
 
-module.exports = React.createClass({
-	
-	getInitialState: function() {
-		return { hide: true };
-	},
+export default class VolumeBar extends Component {
 
-	render: function() {
-		
-		var percent = this.props.volume * 100;
-		var style = {top: (100 - percent) + "%"};
-		var toggleIcon = this.props.volume == 0 ? "volume-off" : "volume-up";
+	constructor() {
+		super();
+		this.state = { hide: true };
+		this.toggle = this.toggle.bind(this);
+		this.adjustVolumeTo = this.adjustVolumeTo.bind(this);
+		this.volumeToMax = this.volumeToMax.bind(this);
+		this.volumeToMin = this.volumeToMin.bind(this);
+	}
 
-		var audioVolumeBarClasses = classnames({
-			'audio-volume-bar': true,
-  		'audio-volume-bar-hide': this.state.hide
-		});
+	render() {
+		const percent = this.props.volume * 100;
+		const style = { top: `${ 100 - percent }%` };
+		const toggleIcon = this.props.volume === 0 ? 'volume-off' : 'volume-up';
 
-		audioVolumeBarContainerId = "audioVolumeBarContainerId" + ++uniquleId;
-		toggleBtnId = "toggleBtn" + ++uniquleId;
+		const audioVolumeBarClasses = classnames(
+			'audio-volume-bar',
+  		{ 'audio-volume-bar-hide': this.state.hide })
+		;
+
+		const audioVolumeBarContainerId = 'audioVolumeBarContainerId' + ++uniquleId;
+		const toggleBtnId = 'toggleBtn' + ++uniquleId;
 
 		return (
 			<div id={audioVolumeBarContainerId} ref="audioVolumeBarContainer" className="audio-volume-bar-container">
@@ -40,12 +43,12 @@ module.exports = React.createClass({
 					<div className="audio-volume-min-max" onClick={this.volumeToMin}>
 						<Glyphicon glyph="volume-off" />
 					</div>
-				</div>	
+				</div>
 			</div>
 		);
-	},
+	}
 
-	toggle: function() {
+	toggle() {
 
 		// when bar open, do nothing if toggle btn press again
 		if (this.isToggleBtnPress) {
@@ -53,18 +56,16 @@ module.exports = React.createClass({
 			return;
 		}
 
-		var hide = !this.state.hide;
-		if (hide) {
-			return;
-		}
+		const hide = !this.state.hide;
+		if (hide) return;
 
 		this.setState({ hide: false });
-		this.globalClickHandler = $(document).mousedown(function(e) {
-			var reactId = this.refs.audioVolumeBarContainer.props.id;
-			var toggleBtnReactId = this.refs.toggleButton.props.id;
-			node = e.target;
+		this.globalClickHandler = $(document).mousedown(e => {
+			const reactId = this.refs.audioVolumeBarContainer.props.id;
+			const toggleBtnReactId = this.refs.toggleButton.props.id;
+			let node = e.target;
 			while(node != null) {
-				var nodeReactId =  $(node).context.id;
+				const nodeReactId =  $(node).context.id;
 				if (reactId === nodeReactId) {
 					return;
 				} else if (toggleBtnReactId === nodeReactId) {
@@ -77,23 +78,21 @@ module.exports = React.createClass({
 			this.globalClickHandler = null;
 			this.setState({ hide: true });
 		}.bind(this));
-		
-	},
-
-	adjustVolumeTo: function(e) {
-		var container = $(this.refs.audioVolumePercentContainer.getDOMNode());
-		var containerStartY = container.offset().top;
-		var percent = (e.clientY - containerStartY) / container.height();	
-		percent = 1 - percent;
-		this.props.adjustVolumeTo(percent);
-	},
-
-	volumeToMax: function() {
-		this.props.adjustVolumeTo(1);
-	},
-
-	volumeToMin: function() {
-		this.props.adjustVolumeTo(0);
 	}
 
-});
+	adjustVolumeTo(e) {
+		const container = $(this.refs.audioVolumePercentContainer);
+		const containerStartY = container.offset().top;
+		let percent = (e.clientY - containerStartY) / container.height();
+		percent = 1 - percent;
+		this.props.adjustVolumeTo(percent);
+	}
+
+	volumeToMax() {
+		this.props.adjustVolumeTo(1);
+	}
+
+	volumeToMin() {
+		this.props.adjustVolumeTo(0);
+	}
+}

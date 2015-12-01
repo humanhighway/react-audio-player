@@ -1,10 +1,10 @@
-var React = require('react/addons');
-var Label = require('react-bootstrap/Label');
+import React, { Component } from 'react';
+import { Label } from 'react-bootstrap';
 
-module.exports = React.createClass({
-	render: function() {
+export default class NameLabel extends Component {
+	render() {
 		return (
 			<span className="audio-name-label pull-left">{this.props.name}</span>
 		);
 	}
-})
+}

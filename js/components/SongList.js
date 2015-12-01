@@ -1,44 +1,39 @@
-var React = require('react/addons');
-var DropDownButton = require("react-bootstrap/DropDownButton");
-var SongItem = require("./SongItem");
-var SongFormatterMixin = require("./../mixins/SongFormatterMixin");
+import React, { Component } from 'react';
+import reactMixin from 'react-mixin';
+import DropDownButton from 'react-bootstrap/lib/DropDownButton';
+import SongItem from './SongItem';
+import SongFormatterMixin from './../mixins/SongFormatterMixin';
 
-module.exports = React.createClass({
+export default class SongList extends Component {
 
-	mixins: [ SongFormatterMixin ],
+	render() {
 
-	render: function() {
+		const { currentSongIndex, isPlaying, isPause, onSongItemClick, songs } = this.props;
+		const songCount = songs.length;
 
-		var songs = [];
-		var currentSongIndex = this.props.currentSongIndex;
-		var isPlaying = this.props.isPlaying;
-		var isPause = this.props.isPause;
-		var songCount = this.props.songs.length;
+		let songItems = songs.map((song, index) => {
 
-		songs = this.props.songs.map(function(song, index){
+			let songName = this.getSongName(song);
+			songName = songCount > 1 ? `${(index + 1)} . ${songName}` : songName;
 
-			var songName = this.getSongName(song);
-			var songName = songCount > 1 ? (index + 1) + ". " + songName : songName;
-
-			return <SongItem currentSongIndex={currentSongIndex} 
-														eventKey={index} 
-														name={songName}
-														isPlaying={isPlaying} 
-														isPause={isPause} 
-														onSongItemClick={this.props.onSongItemClick.bind(null, index)} /> ;
-		}, this);
+			return <SongItem currentSongIndex={currentSongIndex}
+							key={index}
+							eventKey={index}
+							name={songName}
+							isPlaying={isPlaying}
+							isPause={isPause}
+							onSongItemClick={onSongItemClick.bind(null, index)} /> ;
+		});
 
 		return (
 			<div className="audio-songs-list">
-				<DropDownButton ref="dropdownButton">
-					{songs}
+				<DropDownButton title="" id="nested-dropdown" ref="dropdownButton">
+					{ songItems }
 				</DropDownButton>
 			</div>
 		);
-	},
-
-	hideDropdownMenu: function() {
-		this.refs.dropdownButton.setDropdownState(false);
 	}
 
-})
+}
+
+reactMixin(SongList.prototype, SongFormatterMixin);

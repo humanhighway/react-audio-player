@@ -1,12 +1,12 @@
-var React = require('react/addons');
-var TimeFormatterMixin = require('./../mixins/TimeFormatterMixin');
-module.exports = React.createClass({
+import React, { Component } from 'react';
+import reactMixin from 'react-mixin';
+import TimeFormatterMixin from './../mixins/TimeFormatterMixin';
 
-	mixins: [ TimeFormatterMixin ],
-	
-	render: function() {
-		var classes = "audio-time pull-right";
-		if (this.props.seek == undefined || !this.props.duration) {
+export default class TimeLabel extends Component {
+
+	render() {
+		const classes = 'audio-time pull-right';
+		if (this.props.seek === undefined || !this.props.duration) {
 			return (
 				<span></span>
 				// return (<span>&nbsp;</span>);
@@ -14,11 +14,13 @@ module.exports = React.createClass({
 			);
 		}
 
-		var seek = this.secondsToTime(this.props.seek);
-		var duration = this.secondsToTime(this.props.duration);
+		const seek = this.secondsToTime(this.props.seek);
+		const duration = this.secondsToTime(this.props.duration);
 		return (
 			<span className={classes}>{seek} / {duration}</span>
 		);
 	}
 
-});
+}
+
+reactMixin(TimeLabel.prototype, TimeFormatterMixin);

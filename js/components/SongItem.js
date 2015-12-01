@@ -1,32 +1,28 @@
-var React = require('react/addons');
-var classnames = require("classnames");
-var MenuItem = require("react-bootstrap/MenuItem");
-var Glyphicon = require('react-bootstrap/Glyphicon');
+import React, { Component } from 'react';
+import classnames from 'classnames';
+import { MenuItem, Glyphicon } from 'react-bootstrap';
 
-module.exports = React.createClass({
-	render: function() {
+export default class SongItem extends Component {
 
-		var currentSongIndex = this.props.currentSongIndex;
-		var isSelected = this.props.currentSongIndex == this.props.eventKey;
-		var components = [];
+	render() {
+		const { currentSongIndex, eventKey, isPlaying, name, onSongItemClick } = this.props;
+		const isSelected = currentSongIndex === eventKey;
+		const components = [];
 
-		if (isSelected && this.props.isPlaying) {
-			components[0] = <Glyphicon className="audio-song-item-icon active" glyph="play" />;
+		if ( isSelected && isPlaying ) {
+			components[0] = <Glyphicon key="0" className="audio-song-item-icon active" glyph="play" />;
 		} else {
-			components[0] = <span className="audio-song-item-not-selected"></span>;
+			components[0] = <span key="0" className="audio-song-item-not-selected"></span>;
 		}
 
-		components[1] = <span className="audio-song-item-label" >{this.props.name}</span>;
-		
-		var classes = classnames({
-  		'audio-song-item': true,
-  		'active': isSelected,
-		});
+		components[1] = <span key="1" className="audio-song-item-label" >{name}</span>;
+
+		const classes = classnames('audio-song-item', {'active': isSelected });
 
 		return (
-			<MenuItem className={classes} eventKey={this.props.eventKey} onClick={this.props.onSongItemClick} > 
+			<MenuItem className={classes} eventKey={eventKey} onClick={onSongItemClick} >
 				{ components }
 			</MenuItem>
 		);
 	}
-})
+}

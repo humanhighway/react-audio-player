@@ -1,280 +1,288 @@
-var React = require('react/addons');
-var ButtonPanel = require("./ButtonPanel");
-var ProgressBar = require("./ProgressBar");
-var VolumeBar = require("./VolumeBar");
-var TimeLabel = require("./TimeLabel");
-var NameLabel = require("./NameLabel");
-var SongList = require("./SongList");
+import React, { Component } from 'react';
+import reactMixin from 'react-mixin';
+import ButtonPanel from './ButtonPanel';
+import ProgressBar from './ProgressBar';
+import VolumeBar from './VolumeBar';
+import TimeLabel from './TimeLabel';
+import NameLabel from './NameLabel';
+import SongList from './SongList';
+import SongFormatterMixin from './../mixins/SongFormatterMixin';
+import { Howl } from 'howler';
 
-var SongFormatterMixin = require("./../mixins/SongFormatterMixin");
+export default class AudioPlayer extends Component {
 
-var Howl = require('howler').Howl;
-
-module.exports = React.createClass({
-
-	mixins: [ SongFormatterMixin ],
-
-	getDefaultProps: function() {
-		return { songs:[] };
-	},
-
-	getInitialState:function() {
-		return {
+	constructor() {
+		super();
+		this.props = { songs:[] };
+		this.state = {
 			isPlaying: false,
 			isPause: false,
 			isLoading: false,
 			currentSongIndex: -1,
-			volume: 0.5
+			volume: 0.5,
 		};
-	},
 
-	componentWillMount: function() {
+		this._onPlayBtnClick = this._onPlayBtnClick.bind(this);
+		this._onPauseBtnClick = this._onPauseBtnClick.bind(this);
+		this._onPrevBtnClick = this._onPrevBtnClick.bind(this);
+		this._onNextBtnClick = this._onNextBtnClick.bind(this);
+		this._seekTo = this._seekTo.bind(this);
+		this._updateCurrentDuration = this._updateCurrentDuration.bind(this);
+		this._adjustVolumeTo = this._adjustVolumeTo.bind(this);
+		this._initSoundObjectCompleted = this._initSoundObjectCompleted.bind(this);
+		this._playEnd = this._playEnd.bind(this);
+		this._onSongItemClick = this._onSongItemClick.bind(this);
+	}
 
-		if (this.props.dataUrl) {
+	componentWillMount() {
+
+		const { dataUrl, songs } = this.props;
+
+		if (dataUrl) {
 			$.ajax({
-			  dataType: "json",
+			  dataType: 'json',
 			  url: this.props.dataUrl,
-			  success: function(response) {
-			  	this.setState({ 
-			  									songs: response.songs,
-			  									currentSongIndex: 0
-			  							 });
-			  }.bind(this)
+			  success: response => {
+			  	this.setState({
+						songs: response.songs,
+						currentSongIndex: 0,
+					});
+				},
 			});
 		} else if (this.props.songs) {
-			this.setState({ 
-											songs: this.props.songs,
-											currentSongIndex: 0 
-										});
+			this.setState({
+				songs: this.props.songs,
+				currentSongIndex: 0,
+			});
 		} else {
-			throw "no data";
+			throw Error('no data');
 		}
-	},
+	}
 
-	componentDidUpdate: function(prevProps, prevState, prevContext) {
-		if (this.state.isPlaying && this.state.currentSongIndex != prevState.currentSongIndex) {
-			this.initSoundObject();
+	componentDidUpdate(prevProps, prevState, prevContext) {
+		const { isPlaying, currentSongIndex } = this.state;
+		if (isPlaying && currentSongIndex != prevState.currentSongIndex) {
+			this._initSoundObject();
 		}
-	},
+	}
 
-	render: function() {
-		var songCount = this.songCount();
-		var percent = 0;
-		if (this.state.seek && this.state.duration) {
-			percent = this.state.seek / this.state.duration;
-		}
-
-		var topComponents = [
-			<ButtonPanel isPlaying={this.state.isPlaying} isPause={this.state.isPause}
-					isLoading={this.state.isLoading}
-					currentSongIndex={this.state.currentSongIndex} songCount={songCount}
-					onPlayBtnClick={this.onPlayBtnClick} onPauseBtnClick={this.onPauseBtnClick}
-					onPrevBtnClick={this.onPrevBtnClick} onNextBtnClick={this.onNextBtnClick} />,
-			<ProgressBar shorter={songCount > 1} percent={percent} seekTo={this.seekTo} />,
-			<VolumeBar volume={this.state.volume} adjustVolumeTo={this.adjustVolumeTo} />
-		];
-
-		var songName;
-		if (this.songCount() > 1) {
-			topComponents.push(
-				<SongList ref="songList" className="pull-left" 
-						songs={this.state.songs}
-						currentSongIndex={this.state.currentSongIndex} 
-						isPlaying={this.state.isPlaying} isPause={this.state.isPause} 
-						onSongItemClick={this.onSongItemClick}/>
-			);
-			songName = (this.state.currentSongIndex + 1) + ". " + this.getCurrentSongName();
-		} else {
-			songName = this.getCurrentSongName();
-		}
-
-		return (
-			<div className="audio-player">		
-				<div className="clearfix">
-					{ topComponents }
-				</div>
-				
-				<div className="audio-desc-container clearfix">
-					<NameLabel name={songName} />
-					<TimeLabel seek={this.state.seek} duration={this.state.duration}/>
-				</div>
-
-			</div>
-		);
-	},
-
-	onPlayBtnClick: function() {
+	_onPlayBtnClick() {
 		if (this.state.isPlaying && !this.state.isPause) {
 			return;
 		};
 		this.play();
-	},
+	}
 
-	onPauseBtnClick: function() {
-		var isPause = !this.state.isPause;
+	_onPauseBtnClick() {
+		const isPause = !this.state.isPause;
 		this.setState({ isPause: isPause });
-		isPause ? this.pause() : this._play();
-	},
+		isPause ? this._pause() : this._play();
+	}
 
-	onPrevBtnClick: function() {
-		this.prev();
-	},
+	_onPrevBtnClick() {
+		this._prev();
+	}
 
-	onNextBtnClick: function() {
-		this.next();
-	},
+	_onNextBtnClick() {
+		this._next();
+	}
 
- 	onSongItemClick: function(songIndex) {
+ 	_onSongItemClick(songIndex) {
+ 		const { currentSongIndex, isPause, isPlaying } = this.state;
  		// handle pause/playing state.
- 		if (this.state.currentSongIndex == songIndex) {
- 			if (this.state.isPause) {
- 				this.onPauseBtnClick();
- 				this.refs.songList.hideDropdownMenu();
- 			} else if (!this.state.isPlaying) {
- 				this.onPlayBtnClick();
- 				this.refs.songList.hideDropdownMenu();
+ 		if (currentSongIndex == songIndex) {
+ 			if (isPause) {
+ 				this._onPauseBtnClick();
+ 			} else if (!isPlaying) {
+ 				this._onPlayBtnClick();
  			}
  			return;
  		}
 
  		// handle index change state, it must change to play.
-		this.stop();
-		this.clearSoundObject();
-		this.setState({ 
+		this._stop();
+		this._clearSoundObject();
+		this.setState({
 										currentSongIndex: songIndex,
 										duration: 0,
 										isPlaying: true,
 										isPause: false
 									});
- 		this.refs.songList.hideDropdownMenu();
+ 	}
 
- 	},
-
-	play: function() {
-		
+	play() {
 		this.setState({ isPlaying: true, isPause: false });
 
 		if (!this.howler) {
-			this.initSoundObject();
+			this._initSoundObject();
 		} else {
-			var songUrl = this.state.songs[this.state.currentSongIndex].url;
+			const songUrl = this.state.songs[this.state.currentSongIndex].url;
 			if (songUrl != this.howler._src) {
-				this.initSoundObject();
+				this._initSoundObject();
 			} else {
 				this._play();
 			}
 		}
-	},
+	}
 
-	initSoundObject: function() {
-		this.clearSoundObject();
+	_initSoundObject() {
+		this._clearSoundObject();
 		this.setState({ isLoading: true });
 
-		var song = this.state.songs[this.state.currentSongIndex];
+		const song = this.state.songs[this.state.currentSongIndex];
 		this.howler = new Howl({
 			src: song.url,
 			volume: this.state.volume,
-			onload: this.initSoundObjectCompleted,
-			onend: this.playEnd
+			onload: this._initSoundObjectCompleted,
+			onend: this._playEnd,
 		});
-	},
+	}
 
-	clearSoundObject: function() {
+	_clearSoundObject() {
  		if (this.howler) {
 			this.howler.stop();
 			this.howler = null;
 		}
- 	},
+ 	}
 
-	initSoundObjectCompleted: function() {
+	_initSoundObjectCompleted() {
 		this._play();
-		this.setState({ 
+		this.setState({
 			duration: this.howler.duration(),
-			isLoading: false
+			isLoading: false,
 		});
-	},
+	}
 
-	_play: function() {
+	_play() {
 		this.howler.play();
-		this.stopUpdateCurrentDuration();
-		this.updateCurrentDuration();
-		this.interval = setInterval(this.updateCurrentDuration, 1000);
-	},
+		this._stopUpdateCurrentDuration();
+		this._updateCurrentDuration();
+		this.interval = setInterval(this._updateCurrentDuration, 1000);
+	}
 
-	playEnd: function() {
+	_playEnd() {
 		if(this.state.currentSongIndex == this.state.songs.length - 1) {
-			this.stop();
+			this._stop();
 		} else {
-			this.next();
+			this._next();
 		}
-	},
+	}
 
-	stop: function() {
-		this.stopUpdateCurrentDuration();
+	_stop() {
+		this._stopUpdateCurrentDuration();
 		this.setState({ seek: 0, isPlaying: false });
-	},
+	}
 
-	pause: function() {
+	_pause() {
 		this.howler.pause();
-		this.stopUpdateCurrentDuration();
-	},
+		this._stopUpdateCurrentDuration();
+	}
 
-	prev: function() {
+	_prev() {
 		if (this.state.seek > 1 || this.state.currentSongIndex == 0) {
-			this.seekTo(0);
+			this._seekTo(0);
 		} else {
-			this.updateSongIndex(this.state.currentSongIndex - 1);
+			this._updateSongIndex(this.state.currentSongIndex - 1);
 		}
-	},
+	}
 
-	next: function() {
-		this.updateSongIndex(this.state.currentSongIndex + 1);
-	},
+	_next() {
+		this._updateSongIndex(this.state.currentSongIndex + 1);
+	}
 
-	updateSongIndex: function(index) {
-		this.setState({ 
-										currentSongIndex: index,
-										duration: 0
-									});
+	_updateSongIndex(index) {
+		this.setState({
+			currentSongIndex: index,
+			duration: 0,
+		});
 		if (this.state.isPause) {
-			this.stop();
-			this.clearSoundObject();
+			this._stop();
+			this._clearSoundObject();
 		} else {
-			this.stopUpdateCurrentDuration();
+			this._stopUpdateCurrentDuration();
 		}
-	},
+	}
 
-	updateCurrentDuration: function() {
+	_updateCurrentDuration() {
 		this.setState({ seek: this.howler.seek() });
-	},
+	}
 
-	stopUpdateCurrentDuration: function() {
+	_stopUpdateCurrentDuration() {
 		clearInterval(this.interval);
-	},
+	}
 
-	seekTo: function(percent) {
-		var seek = this.state.duration * percent;
+	_seekTo(percent) {
+		const seek = this.state.duration * percent;
 		this.howler.seek(seek);
 		this.setState({ seek: seek });
-	},
+	}
 
-	adjustVolumeTo: function(percent) {
+	_adjustVolumeTo(percent) {
 		this.setState({ volume: percent });
 		if (this.howler) {
 			this.howler.volume(percent);
 		}
-	},
+	}
 
-	songCount: function() {
+	songCount() {
 		return this.state.songs ? this.state.songs.length : 0;
-	},
+	}
 
-	getCurrentSongName: function() {
-		if (this.state.currentSongIndex < 0) {
-			return "";
-		}
-		var song = this.state.songs[this.state.currentSongIndex];
+	getCurrentSongName() {
+		if (this.state.currentSongIndex < 0) return '';
+		const song = this.state.songs[this.state.currentSongIndex];
 		return this.getSongName(song);
  	}
 
-});
+	render() {
+		const songCount = this.songCount();
+		const { seek, duration, volume,
+						isPlaying, isPause, isLoading, currentSongIndex } = this.state;
+
+		let percent = 0;
+
+		if (seek && duration) {
+			percent = seek / duration;
+		}
+
+		const topComponents = [
+			<ButtonPanel key="0"
+					isPlaying={isPlaying} isPause={isPause}
+					isLoading={isLoading}
+					currentSongIndex={currentSongIndex} songCount={songCount}
+					onPlayBtnClick={this._onPlayBtnClick} onPauseBtnClick={this._onPauseBtnClick}
+					onPrevBtnClick={this._onPrevBtnClick} onNextBtnClick={this._onNextBtnClick} />,
+			<ProgressBar key="1" shorter={songCount > 1} percent={percent} seekTo={this._seekTo} />,
+			<VolumeBar key="2" volume={volume} adjustVolumeTo={this._adjustVolumeTo} />,
+		];
+
+		let songName;
+		if (this.songCount() > 1) {
+			topComponents.push(
+				<SongList key="3" ref="songList" className="pull-left"
+						songs={this.state.songs}
+						currentSongIndex={currentSongIndex}
+						isPlaying={isPlaying} isPause={isPause}
+						onSongItemClick={this._onSongItemClick}/>
+			);
+			songName = `${this.state.currentSongIndex + 1} . ${this.getCurrentSongName()}`;
+		} else {
+			songName = this.getCurrentSongName();
+		}
+
+		return (
+			<div className="audio-player">
+				<div className="clearfix">
+					{ topComponents }
+				</div>
+				<div className="audio-desc-container clearfix">
+					<NameLabel name={songName} />
+					<TimeLabel seek={this.state.seek} duration={this.state.duration}/>
+				</div>
+			</div>
+		);
+	}
+
+}
+
+reactMixin(AudioPlayer.prototype, SongFormatterMixin);

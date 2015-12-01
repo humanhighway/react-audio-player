@@ -1,17 +1,20 @@
-require("./../sass/app.scss");
+import React from 'react';
+import ReactDOM from 'react-dom';
+import AudioPlayer from './components/AudioPlayer';
 
-var React = require('react/addons');
-var AudioPlayer = require("./components/AudioPlayer");
+require('./../sass/app.scss');
 
-var songs = [
-	{
-		url: "assets/stop.mp3"
-	}
-]
+const songs = [
+	{ url: 'assets/stop.mp3' },
+];
 
-React.render(	<AudioPlayer songs={songs} />, 
-							document.getElementById('audio-player1')	);
+ReactDOM.render(
+  <AudioPlayer songs={songs} />,
+  document.getElementById('audio-player1')
+);
 
-React.render(	<AudioPlayer dataUrl="./assets/songs.json" />, 
-							document.getElementById('audio-player2')	);
+ReactDOM.render(
+  <AudioPlayer dataUrl="./assets/songs.json" />,
+	document.getElementById('audio-player2')
+);
 

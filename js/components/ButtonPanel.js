@@ -1,38 +1,38 @@
-var React = require('react/addons');
-var Button = require('react-bootstrap/Button');
-var Glyphicon = require('react-bootstrap/Glyphicon');
-var ButtonGroup = require('react-bootstrap/ButtonGroup');
+import React, { Component } from 'react';
+import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
 
-module.exports = React.createClass({
+export default class ButtonPanel extends Component {
 
-	getDefaultProps: function() {
-		return {
+	constructor() {
+		super();
+		this.props = {
 			currentSongIndex: 0,
-			songCount: 0
+			songCount: 0,
 		};
-	},
+	}
 
-	render: function() {
+	render() {
 
-		var isPlaying = this.props.isPlaying;
-		var isPause = this.props.isPause;
-		var isLoading = this.props.isLoading;
-		var isShowPlayBtn = !isPlaying || isPause;
-		var buttonClickHandler = isShowPlayBtn ? this.props.onPlayBtnClick : this.props.onPauseBtnClick;
-		var iconName;
-		var iconClasses = "";
+		const { isPlaying, isPause, isLoading, songCount,
+						onPlayBtnClick, onPauseBtnClick, currentSongIndex } = this.props;
+
+
+		const isShowPlayBtn = !isPlaying || isPause;
+		const buttonClickHandler = isShowPlayBtn ? this.props.onPlayBtnClick : this.props.onPauseBtnClick;
+		let iconName;
+		let iconClasses;
 
 		if (isLoading) {
-			iconName = "refresh";
-			iconClasses = "audio-refresh-animate";
+			iconName = 'refresh';
+			iconClasses = 'audio-refresh-animate';
 		} else {
-			iconName = isShowPlayBtn ? "play" : "pause";
+			iconName = isShowPlayBtn ? 'play' : 'pause';
+			iconClasses = '';
 		}
 
-		var songIndex = this.props.currentSongIndex;
-		var buttonPanelClasses = "audio-button-panel pull-left";
+		var buttonPanelClasses = 'audio-button-panel pull-left';
 
-		if (this.props.songCount < 2) {
+		if (songCount < 2) {
 			return (
 				<ButtonGroup className={buttonPanelClasses}>
 					<Button bsSize="small" onClick={buttonClickHandler}>
@@ -42,8 +42,7 @@ module.exports = React.createClass({
 			);
 		} else {
 
-			var nextButtonClass = songIndex == this.props.songCount - 1 ? "disabled" : "";
-			
+			const nextButtonClass = currentSongIndex === this.props.songCount - 1 ? 'disabled' : '';
 			return (
 				<ButtonGroup className={buttonPanelClasses}>
 					<Button bsSize="small" onClick={this.props.onPrevBtnClick}>
@@ -59,4 +58,4 @@ module.exports = React.createClass({
 			);
 		}
 	}
-});
+}
